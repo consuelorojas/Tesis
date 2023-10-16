@@ -25,6 +25,7 @@ class SimulatedSignal:
         self.cutoff = cutoff
         self.t = t
         self.fs = fs
+        self.random = random.randint(0,1000)
 
     def faradayWave(self, height = 5*(10**-3), harmonics = 15):
         '''
@@ -59,7 +60,7 @@ class SimulatedSignal:
         Returns:
         @ noise: noise signal
         '''
-        random.seed(42)
+        random.seed(self.random)
         n = np.random.normal(0, 1, self.fs)/100
         b, a = signal.butter(3, self.cutoff, btype='low', analog=False)
         noise = signal.filtfilt(b, a, n)

@@ -1,0 +1,29 @@
+%% Setup Session, Add Channels and Configure Parameters
+% Create the data acquisition session
+daqSession = daq.createSession('ni');
+% Create analog input channel with board ID 'Dev1', Channel 'ai0', measuring 'Voltage'
+daqSession.addAnalogInputChannel('Dev1', 'ai0', 'Voltage');
+% Set property value
+daqSession.DurationInSeconds = 10;
+%% Data Acquisition and Plotting
+% Start the acquisition
+disp('Acquiring data...');
+[data, time] = daqSession.startForeground();
+disp('Acquisition complete.');
+% Plot the acquired data in a new figure window
+figure;
+plot(time, data);
+% Set property value
+daqSession.DurationInSeconds = 600;
+%% Data Acquisition and Plotting
+% Start the acquisition
+disp('Acquiring data...');
+[data, time] = daqSession.startForeground();
+disp('Acquisition complete.');
+% Plot the acquired data in a new figure window
+figure;
+plot(time, data);
+%% Clean up and release hardware
+daqSession.release();
+delete(daqSession);
+clear daqSession;
