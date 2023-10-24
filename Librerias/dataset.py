@@ -3,6 +3,9 @@ import numpy as np
 import scipy.io
 from scipy.signal import butter, filtfilt, hilbert
 
+import sys
+sys.path.append('.../data')
+
 class MatFileToDataFrame:
     '''
     A class that converts a MATLAB .mat file to a pandas DataFrame with additional signal processing steps.
@@ -25,7 +28,7 @@ class MatFileToDataFrame:
     hilbert_transform(signal)
         Applies a Hilbert transform to the input signal to obtain the amplitude envelope.
     '''
-    def __init__(self, file_path, variable_name, cutoff):
+    def __init__(self, file_path, file_name):
         '''
         Initializes the MatFileToDataFrame object.
 
@@ -39,8 +42,7 @@ class MatFileToDataFrame:
             The cutoff frequency or frequencies for the bandpass filter.
         '''
         self.file_path = file_path
-        self.variable_name = variable_name
-        self.cutoff = cutoff
+        self.file_name = file_name
     
     def get_dataframe(self, cutoff):
         '''
@@ -56,8 +58,8 @@ class MatFileToDataFrame:
         df : pandas DataFrame
             A DataFrame with the original signal, signal minus mean, filtered signal, and Hilbert transform.
         '''
-        mat_data = scipy.io.loadmat(self.file_path)
-        signal = pd.DataFrame(mat_data[self.variable_name])
+        mat_data = scipy.io.loadmat(self.file_path+self.file_name)
+        signal = pd.DataFrame(mat_data['data'])
         signal_mean = signal.mean(axis=0)
         signal_filtered = self.butter_bandpass_filter(signal, cutoff)
         signal_hilbert = self.hilbert_transform(signal_filtered)
@@ -85,8 +87,8 @@ class MatFileToDataFrame:
         signal_filtered : pandas DataFrame
             The filtered signal.
         '''
-        nyq = 0.5 * fs
-        normal_cutoff = self.cutoff / nyq
+        #nyq = 0.5 * fs
+        normal_cutoff = cutoff #/ nyq
     
         if len(cutoff) > 1:
             b, a = butter(order, normal_cutoff, btype='band', analog=False)
@@ -94,7 +96,7 @@ class MatFileToDataFrame:
             b, a = butter(order, normal_cutoff, btype='low', analog=False)
 
         signal_filtered = filtfilt(b, a, signal, axis=0)
-        return signal_filtered
+        return pd.DataFrame(signal_filtered)
     
     def hilbert_transform(self, signal):
         '''
