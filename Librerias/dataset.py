@@ -67,7 +67,7 @@ class MatFileToDataFrame:
         df.columns = ['Original Signal', 'Signal - Mean', 'Filtered Signal', 'Hilbert Transform']
         return df
     
-    def butter_bandpass_filter(self, signal, cutoff, fs=1000, order=1):
+    def butter_bandpass_filter(self, signal, cutoff, fs=1000, order=4):
         '''
         Applies a Butterworth bandpass filter to the input signal.
 
@@ -94,6 +94,7 @@ class MatFileToDataFrame:
             b, a = butter(order, normal_cutoff, btype='band', analog=False)
         else:
             b, a = butter(order, normal_cutoff, btype='low', analog=False)
+        
 
         signal_filtered = filtfilt(b, a, signal, axis=0)
         return pd.DataFrame(signal_filtered)
