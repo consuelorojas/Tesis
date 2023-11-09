@@ -91,12 +91,17 @@ class MatFileToDataFrame:
         normal_cutoff = cutoff #/ nyq
     
         if len(cutoff) > 1:
-            b, a = butter(order, normal_cutoff, btype='band', analog=False)
+            #no se usa un filtro pasabanda de principios, porque genera problemas con el mustreo, generando peaks donde no existen
+        
+            b, a = butter(order, normal_cutoff, btype='low', analog=False)
+            c, d = butter(order, normal_cutoff, btype='high', analog=False)
+            signal_filtered = filtfilt(b, a, signal, axis=0)
+            signal_filtered = filtfilt(c, d, signal_filtered, axis=0)
+
         else:
             b, a = butter(order, normal_cutoff, btype='low', analog=False)
+            signal_filtered = filtfilt(b, a, signal, axis=0)
         
-
-        signal_filtered = filtfilt(b, a, signal, axis=0)
         return pd.DataFrame(signal_filtered)
     
     def hilbert_transform(self, signal):
