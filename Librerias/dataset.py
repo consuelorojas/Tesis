@@ -67,7 +67,7 @@ class MatFileToDataFrame:
         df.columns = ['Original Signal', 'Signal - Mean', 'Filtered Signal', 'Hilbert Transform']
         return df
     
-    def butter_bandpass_filter(self, signal, cutoff, fs=1000, order=4):
+    def butter_bandpass_filter(self, signal, cutoff, order=4):
         '''
         Applies a Butterworth bandpass filter to the input signal.
 
@@ -91,14 +91,21 @@ class MatFileToDataFrame:
         normal_cutoff = cutoff #/ nyq
     
         if len(cutoff) > 1:
+            #pasa baja
+            a, b = butter(order, normal_cutoff[1], btype='low', analog=False)
+            sig1 =  filtfilt(a, b, signal, axis=0)
+            #pasa alta
+            c, d = butter(order, normal_cutoff[0], btype='high', analog=False)
+            signal_filtered = filtfilt(c, d, sig1, axis=0)
+
             #no se usa un filtro pasabanda de principios, porque genera problemas con el mustreo, generando peaks donde no existen
         
-            b, a = butter(order, normal_cutoff, btype='band', analog=False)
+            #b, a = butter(order, normal_cutoff, btype='band', analog=False)
             #c, d = butter(order, normal_cutoff[1], btype='high', analog=False)
-            signal_filtered = filtfilt(b, a, signal, axis=0)
+            #signal_filtered = filtfilt(b, a, signal, axis=0)
             #signal_filtered = filtfilt(c, d, signal_filtered, axis=0)
 
-        else:
+        elif len(cutoff) == 1:
             b, a = butter(order, normal_cutoff, btype='low', analog=False)
             signal_filtered = filtfilt(b, a, signal, axis=0)
         
