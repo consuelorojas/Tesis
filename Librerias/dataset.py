@@ -98,13 +98,6 @@ class MatFileToDataFrame:
             c, d = butter(order, normal_cutoff[0], btype='high', analog=False)
             signal_filtered = filtfilt(c, d, sig1, axis=0)
 
-            #no se usa un filtro pasabanda de principios, porque genera problemas con el mustreo, generando peaks donde no existen
-        
-            #b, a = butter(order, normal_cutoff, btype='band', analog=False)
-            #c, d = butter(order, normal_cutoff[1], btype='high', analog=False)
-            #signal_filtered = filtfilt(b, a, signal, axis=0)
-            #signal_filtered = filtfilt(c, d, signal_filtered, axis=0)
-
         elif len(cutoff) == 1:
             b, a = butter(order, normal_cutoff, btype='low', analog=False)
             signal_filtered = filtfilt(b, a, signal, axis=0)
@@ -122,8 +115,8 @@ class MatFileToDataFrame:
 
         Returns:
         --------
-        amplitude_envelope : pandas DataFrame
-            The amplitude envelope of the input signal.
+        analytic_signal : pandas DataFrame
+            The Hilbert Transform of the input signal.
         '''
         analytic_signal = hilbert(signal, axis=0)
         analytic_signal = pd.DataFrame(analytic_signal)
