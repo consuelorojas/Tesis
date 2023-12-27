@@ -4,10 +4,10 @@ import scipy.io
 from scipy.signal import butter, filtfilt, hilbert
 
 import sys
-sys.path.append('.../data')
-sys.path.append('.../Librerias')
+sys.path.append('../data')
+sys.path.append('../Librerias')
 
-import Librerias.utils as utils
+import utils
 
 
 #class
@@ -57,7 +57,7 @@ class CaractDefect:
         diff_phase = np.insert(diff_phase, 0, 0)
 
 
-        b, a = butter(order, cutoff, fs=self.fs, btype='lowpass')
+        b, a = butter(order, cutoff, btype='low')
         grad_phase = filtfilt(b, a, diff_phase-mean_phase)
 
         hilbert_pd = pd.DataFrame({'Hilbert Transform': df['Hilbert Transform'],
@@ -65,7 +65,7 @@ class CaractDefect:
                                    'Instantaneous Phase': int_phase,
                                    'Gradient Phase': grad_phase})
         
-        return hilbert_pd
+        return hilbert_pd, [diff_phase, mean_phase]
     
     def get_peaks(self, cutoff = 0.1, order = 4):
         '''
@@ -77,9 +77,9 @@ class CaractDefect:
         pandas.DataFrame: 
             A DataFrame containing the peaks of the signal.
         '''
-        df = self.df
-        hilbert =  self.get_hilbert(cutoff, order)
-        peaks, _ = scipy.signal.find_peaks(hilbert['Gradient Phase'], distance=10)
+        _, phase =  self.get_hilbert(cutoff, order)
+
+        peaks, _ = scipy.signal.find_peaks(np.abs(phase[0]-phase[1]), [0, 5.0], width = [0, 100], distance=10)
         peaks_pd = pd.DataFrame({'Peaks': peaks})
         return peaks_pd
     
@@ -98,7 +98,7 @@ class CaractDefect:
         pandas.DataFrame: 
             A DataFrame containing the minimum amplitude of the signal.
         '''
-        frame = self.get_hilbert()
+        frame, _ = self.get_hilbert()
         min_amp = frame['Amplitude'].min()
         indices = frame[frame['Amplitude'] <= min_amp*mult].index
         indices = pd.DataFrame({'Min Amp': indices})
@@ -128,14 +128,48 @@ class CaractDefect:
         min_amp = self.get_minAmp(mult)
         hilbert = self.get_hilbert(cutoff, order)
 
-        intersection = np.intersect1d(peaks, min_amp, assume_unique=False, return_indices=False)
+        intersection = np.intersect1d(peaks['Peaks'].values, min_amp['Min Amp'].values, assume_unique=False, return_indices=False)
 
         defectos_pd = []
+
         for i in intersection:
             x = self.df.iloc[i - 500 : i + 500]
-            y = hilbert.iloc[i - 500 : i + 500]
+            y = hilbert[0].iloc[i - 500 : i + 500]
+            index = x.index
 
-            defectos_pd.append(pd.concat([x, y], axis=1))
+            defectos_pd.append(pd.merge(x, y, on='Hilbert Transform', how='inner').set_index(index)
+             )
 
         return intersection, defectos_pd
+    
+
+    def get_tau(self, interval=15):
+        """
+        Returns the output dataframe containing the median minimums and corresponding tau values.
+
+        Parameters:
+        -----------
+        interval (int):
+          The interval size for calculating the minimums.
+
+        Returns:
+        --------
+        output (DataFrame):
+          The output dataframe containing the median minimums and corresponding to indexes to gettau values.
+
+
+        """
+        indices, defectos_df = self.get_defectos()
+        hilbert, _ = self.get_hilbert()
+
+        #obtengo los minimos de todos los defectos en el arreglo de defectos_df
+        mins = utils.min_in_arrays(defectos_df, 'Gradient Phase', indices, interval=interval)
+        #obtengo los indices para obtener los tau
+        indices_tau = utils.get_tau(indices, defectos_df, mins)
+        taus = pd.DataFrame({'min medio': indices_tau})
+        output = pd.concat(mins, taus, axis=1)
+        return output
+    
+
+
     
