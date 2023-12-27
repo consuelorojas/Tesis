@@ -13,14 +13,12 @@ import Librerias.utils as utils
 #class
 class CaractDefect:
     '''A class that calculates the characteristics of a defect in the signal
-  
-    
     '''
 
 
     def __init__(self, df, fs=1000):
         '''
-        Initializes the MatFileToDataFrame object.
+        Initializes the CaractDefect object.
 
         Parameters:
         -----------
