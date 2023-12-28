@@ -142,6 +142,9 @@ class CaractDefect:
 
         return intersection, defectos_pd
     
+    def get_mins(self, interval = 15):
+        mins = utils.min_in_arrays(self.df['Hilbert Transform'], 'Gradient Phase', self.get_defectos()[0], interval=interval)
+        return mins
 
     def get_tau(self, interval=15):
         """
@@ -165,7 +168,7 @@ class CaractDefect:
         #obtengo los minimos de todos los defectos en el arreglo de defectos_df
         mins = utils.min_in_arrays(hilbert, 'Gradient Phase', indices, interval=interval)
         #obtengo los indices para obtener los tau
-        indices_tau = utils.get_tau(indices, hilbert, mins)
+        indices_tau = utils.get_indices_tau(indices, hilbert, mins)
         taus = pd.DataFrame({'min medio': indices_tau})
         output = pd.concat(mins, taus, axis=1)
         return output

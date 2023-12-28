@@ -23,60 +23,52 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-def  min_in_subset(df_general, index, interval):
-    '''
-    Find the minimum values in the given series.
-
-    Parameters:
-    -----------
-    series (pandas.Series):
-      The input series.
-    index (int):
-      The index to search.
-    interval (int):
-      The interval to search.
-
-    Returns:
-    --------
-    The minimum value in the given series.
-    '''
-    min1 = np.argmin(np.abs(df_general[index-interval:index]))
-    min2 = np.argmin(np.abs(df_general[index:index+interval]))
-
-    return min1+index-interval, min2+index
-   
-
-def min_in_arrays(df_general, serie, array, interval=15):
+def get_indices_min(serie, indice, intervalo):
   """
-  Find the minimum values within subsets of a DataFrame column for each element in an array.
+  Obtiene los índices de los valores mínimos en una serie dentro de un intervalo alrededor de un índice dado.
+
+  Args:
+    serie (list): La serie de valores.
+    indice (int): El índice alrededor del cual se buscarán los valores mínimos.
+    intervalo (int): El tamaño del intervalo alrededor del índice.
+
+  Returns:
+    list: Una lista de los índices de los valores mínimos encontrados.
+  """
+  min1 = np.argmin(np.abs(serie[indice-intervalo: indice]))
+  min2 = np.argmin(np.abs(serie[indice: indice+intervalo]))
+  return min1+indice-intervalo, min2+indice
+
+   
+def get_minimuns(serie, x, interval):
+  """
+  Returns the start and end indices of the minimum values in the given series within the specified interval.
 
   Parameters:
   -----------
-  df_general (DataFrame):
-    The DataFrame containing the data.
-  serie (str):
-    The name of the column in the DataFrame to analyze.
-  array (list):
-    The array of elements to create subsets and find minimum values.
-  interval (int, optional):
-    The size of the subsets. Defaults to 15.
+  serie (pandas.Series):
+    The series to search for minimum values.
+  x (list):
+    The list of values to search for minimum values within the interval.
+  interval (int):
+    The interval to search for minimum values.
 
   Returns:
   --------
-  DataFrame:
-    A DataFrame with the start and end values of the minimum subsets.
+  pandas.DataFrame:
+    A DataFrame containing the start and end indices of the minimum values.
   """
   min1 = []
   min2 = []
-  for elem in array:
-    aux1, aux2 = min_in_subset(df_general[serie], elem, interval)
+  for elem in x:
+    aux1, aux2 = get_indices_min(serie, elem, interval)
     min1.append(aux1)
     min2.append(aux2)
 
   minimuns = pd.DataFrame({'start': min1, 'end': min2})
   return minimuns
 
-def get_tau(array, df_general, df_min):
+def get_indices_tau(array, df_general, df_min):
   """
   Get the indices to get tau values.
 
