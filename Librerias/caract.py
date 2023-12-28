@@ -143,25 +143,14 @@ class CaractDefect:
         return intersection, defectos_pd
     
     def get_mins(self, interval = 15):
-        mins = utils.min_in_arrays(self.df['Hilbert Transform'], 'Gradient Phase', self.get_defectos()[0], interval=interval)
+        hilbert = self.get_hilbert()[0]
+        mins = utils.get_minimuns(hilbert, self.get_defectos()[0], interval=interval)
         return mins
 
     def get_tau(self, interval=15):
-        """
-        Returns the output dataframe containing the median minimums and corresponding tau values.
+        #rehacer, viendo que necesito para poder utilizar get_indices_tau
+        #de utils porque se supone que todo funciona, hasta este punto.
 
-        Parameters:
-        -----------
-        interval (int):
-          The interval size for calculating the minimums.
-
-        Returns:
-        --------
-        output (DataFrame):
-          The output dataframe containing the median minimums and corresponding to indexes to gettau values.
-
-
-        """
         indices, defectos_df = self.get_defectos()
         hilbert, _ = self.get_hilbert()
 
