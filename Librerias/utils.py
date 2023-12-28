@@ -19,11 +19,11 @@ def find_nearest(array, value):
     The element in the array that is closest to the specified value.
     '''
 
-    array = np.asarray(array)
+    #array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
-def  min_in_subset(serie, index, interval):
+def  min_in_subset(df_general, index, interval):
     '''
     Find the minimum values in the given series.
 
@@ -40,39 +40,36 @@ def  min_in_subset(serie, index, interval):
     --------
     The minimum value in the given series.
     '''
-    min1 = np.argmin(np.abs(serie[index-interval:index]))
-    min2 = np.argmin(np.abs(serie[index:index+interval]))
+    min1 = np.argmin(np.abs(df_general[index-interval:index]))
+    min2 = np.argmin(np.abs(df_general[index:index+interval]))
 
     return min1+index-interval, min2+index
    
 
-def min_in_arrays(array_frame, serie, array, interval=15):
-  '''
-  Find the minimum values within a specified interval for each element in an array.
+def min_in_arrays(df_general, serie, array, interval=15):
+  """
+  Find the minimum values within subsets of a DataFrame column for each element in an array.
 
   Parameters:
   -----------
-  array_frame (list):
-    A list of arrays or data frames.
-  serie (int):
-    The index of the series within each array or data frame.
+  df_general (DataFrame):
+    The DataFrame containing the data.
+  serie (str):
+    The name of the column in the DataFrame to analyze.
   array (list):
-    A list of elements.
+    The array of elements to create subsets and find minimum values.
   interval (int, optional):
-    The interval size. Defaults to 15.
+    The size of the subsets. Defaults to 15.
 
   Returns:
   --------
-  pandas.DataFrame:
-    A DataFrame containing the start and end values of the minimum intervals.
-
-  '''
+  DataFrame:
+    A DataFrame with the start and end values of the minimum subsets.
+  """
   min1 = []
   min2 = []
-
-  for i in range(len(array)):
-    subset = array_frame[i]
-    aux1, aux2 = min_in_subset(subset[serie], array[i], interval)
+  for elem in array:
+    aux1, aux2 = min_in_subset(df_general[serie], elem, interval)
     min1.append(aux1)
     min2.append(aux2)
 
@@ -98,13 +95,15 @@ def get_tau(array, df_general, df_min):
     List of mid interval indices.
   """
   indices_tau = []
+  serie = df_general['Gradient Phase']
+
   for i in range(len(array)):
     x = array[i]
-    y = df_min['end'].iloc[i]
-    subset1 = df_general[i]
+    y = df_min['end'][i]
 
-    num1 =  np.abs(subset1['Gradient Phase'].iloc[x])/2
-    subset2 = np.abs(subset1['Gradient Phase'].iloc[x:y])
+    num1 =  np.abs(serie[x])/2
+    subset2 = np.abs(serie[x:y])
+    print(x,y)
     num2 = find_nearest(subset2, num1)
 
     indices2 = subset2[np.abs(subset2 == num2)].index[0]
