@@ -19,25 +19,14 @@ def find_nearest(array, value):
     The element in the array that is closest to the specified value.
     '''
 
-    #array = np.asarray(array)
+    array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
 def get_indices_min(serie, indice, intervalo):
-  """
-  Obtiene los índices de los valores mínimos en una serie dentro de un intervalo alrededor de un índice dado.
-
-  Args:
-    serie (list): La serie de valores.
-    indice (int): El índice alrededor del cual se buscarán los valores mínimos.
-    intervalo (int): El tamaño del intervalo alrededor del índice.
-
-  Returns:
-    list: Una lista de los índices de los valores mínimos encontrados.
-  """
-  min1 = np.argmin(np.abs(serie[indice-intervalo: indice]))
-  min2 = np.argmin(np.abs(serie[indice: indice+intervalo]))
-  return min1+indice-intervalo, min2+indice
+    min1 = np.argmin(np.abs(serie[indice-intervalo: indice]))
+    min2 = np.argmin(np.abs(serie[indice: indice+intervalo]))
+    return (min1+indice-intervalo), (min2+indice)
 
    
 def get_minimuns(serie, x, interval):
@@ -90,12 +79,12 @@ def get_indices_tau(array, df_general, df_min):
   serie = df_general['Gradient Phase']
 
   for i in range(len(array)):
+
     x = array[i]
-    y = df_min['end'][i]
+    y = df_min['end'].iloc[i]
 
     num1 =  np.abs(serie[x])/2
     subset2 = np.abs(serie[x:y])
-    print(x,y)
     num2 = find_nearest(subset2, num1)
 
     indices2 = subset2[np.abs(subset2 == num2)].index[0]

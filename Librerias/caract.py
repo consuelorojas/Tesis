@@ -143,25 +143,41 @@ class CaractDefect:
         return intersection, defectos_pd
     
     def get_mins(self, interval = 15):
-        hilbert = self.get_hilbert()[0]
-        mins = utils.get_minimuns(hilbert, self.get_defectos()[0], interval=interval)
+        hilbert, _ = self.get_hilbert()
+        defectos, _ = self.get_defectos()
+        gradiente = hilbert['Gradient Phase']
+        mins = utils.get_minimuns(gradiente, defectos, interval=interval)
         return mins
 
-    def get_tau(self, interval=15):
-        #rehacer, viendo que necesito para poder utilizar get_indices_tau
-        #de utils porque se supone que todo funciona, hasta este punto.
+    def get_tau_indices(self, interval=15):
 
-        indices, defectos_df = self.get_defectos()
-        hilbert, _ = self.get_hilbert()
+        # variables para usar la función get_indices_tau
+        defectos, _ = self.get_defectos() #lista con indices de los defectos
+        hilbert, _ = self.get_hilbert() #dataframe con hilbert transform, amplitude, instantaneous phase, gradient phase
+        mins = self.get_mins(interval=interval) #dataframe con los minimos de cada defecto
 
-        #obtengo los minimos de todos los defectos en el arreglo de defectos_df
-        mins = utils.min_in_arrays(hilbert, 'Gradient Phase', indices, interval=interval)
-        #obtengo los indices para obtener los tau
-        indices_tau = utils.get_indices_tau(indices, hilbert, mins)
-        taus = pd.DataFrame({'min medio': indices_tau})
-        output = pd.concat(mins, taus, axis=1)
+        # uso función de utils
+        indices_tau = utils.get_indices_tau(defectos, hilbert, mins)
+        #taus = pd.DataFrame({'min medio': indices_tau})
+        output = pd.DataFrame({'peak': defectos ,'start': mins['start'], 'end': mins['end'], 'tau': indices_tau})
         return output
     
 
+    def get_tau(self, interval=15):
+        df = self.get_tau_indices(interval=interval)
 
+        duration_samples = df['end'] - df['start']
+        duration = duration_samples/self.fs
+
+        tau_samples = (df['tau'] - df['peak'])*2
+        tau = tau_samples/self.fs
+
+        app_samples = df['start'].shift(-1) - df['end']
+        app_time = app_samples/self.fs
+
+        output = pd.DataFrame({'duration': duration, 'tau': tau, 'app_time': app_time})
+        output_samples = pd.DataFrame({'duration': duration_samples, 'tau': tau_samples, 'app_time': app_samples})
+
+        return output, output_samples
     
+
