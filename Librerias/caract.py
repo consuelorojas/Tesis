@@ -180,5 +180,16 @@ class CaractDefect:
 
         return output, output_samples
     
-    
 
+    def get_no_defectos(self, interval=15):
+        df = self.df.copy()
+        hilbert, _ = self.get_hilbert()
+        defects, _ = self.get_defectos()
+        tau = self.get_tau(interval=interval)[1]
+        duration = int(tau['duration'].mean())*2
+
+        for index in defects:
+            df[index-duration:index+duration] = np.nan
+            hilbert[index-duration:index+duration] = np.nan
+
+        return df, hilbert
