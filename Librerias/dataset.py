@@ -59,7 +59,7 @@ class MatFileToDataFrame:
             A DataFrame with the original signal, signal minus mean, filtered signal, and Hilbert transform.
         '''
         mat_data = scipy.io.loadmat(self.file_path+self.file_name)
-        signal = pd.DataFrame(mat_data['data'])
+        signal = pd.DataFrame(mat_data['data'])[0]
         signal_mean = signal.mean(axis=0)
         signal_filtered = self.butter_bandpass_filter(signal, cutoff)
         signal_hilbert = self.hilbert_transform(signal_filtered)
