@@ -24,9 +24,28 @@ def find_nearest(array, value):
     return array[idx]
 
 def get_indices_min(serie, indice, intervalo):
-    min1 = np.argmin(np.abs(serie[indice-intervalo: indice]))
-    min2 = np.argmin(np.abs(serie[indice: indice+intervalo]))
-    return (min1+indice-intervalo), (min2+indice)
+  """
+  Returns the indices of the minimum values in a given series within a specified interval around a given index.
+
+  Parameters:
+  -----------
+    serie (array-like):
+      The series of values.
+    indice (int):
+      The index around which to search for minimum values.
+    intervalo (int):
+      The interval size around the index to consider.
+
+  Returns:
+  ------------
+    tuple:
+      A tuple containing the indices of the minimum values found. The first element is the index of the minimum value
+    within the interval before the given index, and the second element is the index of the minimum value within the interval
+    after the given index.
+  """
+  min1 = np.argmin(np.abs(serie[indice-intervalo: indice]))
+  min2 = np.argmin(np.abs(serie[indice: indice+intervalo]))
+  return (min1+indice-intervalo), (min2+indice)
 
    
 def get_minimuns(serie, x, interval):
@@ -91,3 +110,54 @@ def get_indices_tau(array, df_general, df_min):
     indices_tau.append(indices2)
   return indices_tau
 
+
+def create_windows(df, size=4000, overlap=500):
+  """
+  Creates overlapping windows of a specified size from a given DataFrame.
+  
+  Parameters:
+  --------------
+    df (DataFrame):
+      The input DataFrame.
+    size (int):
+      The size of each window. Default is 4000.
+    overlap (int):
+      The overlap between consecutive windows. Default is 500.
+  
+  Returns:
+  ---------------
+    list:
+      A list of windows, where each window is a subset of the input DataFrame.
+  """
+  num_windows = (len(df) - size) // (size - overlap) + 1
+  windows = []
+  for i in range(num_windows):
+    start = i * (size - overlap)
+    end = start + size
+    window = df.iloc[start:end]
+    windows.append(window)
+  return windows
+
+def find_windows(start_end_defectos, windows):
+  """
+  Finds the windows that contain the given start and end points of defects.
+
+  Parameters:
+  --------------
+  start_end_defectos (list):
+    A list of tuples representing the start and end points of defects.
+  windows (list):
+    A list of windows.
+
+  Returns:
+  ---------------
+  list:
+    A list of indices of the windows that contain the defects.
+  """
+  result = []
+  for elem in start_end_defectos:
+    for i, window in enumerate(windows):
+      if elem[0] >= window.index[0] and elem[1] <= window.index[-1]:
+        result.append(i)
+        break
+  return result
