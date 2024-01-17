@@ -142,7 +142,21 @@ class CaractDefect:
 
         return intersection, defectos_pd
     
-    def get_mins(self, interval = 15):
+    def get_mins(self, interval=15):
+        """
+        Get the local minima of the gradient phase.
+
+        Parameters:
+        -----------
+            interval (int):
+              The interval size for finding the minima.
+
+        Returns:
+        ----------
+            list:
+              A list of local minima.
+
+        """
         hilbert, _ = self.get_hilbert()
         defectos, _ = self.get_defectos()
         gradiente = hilbert['Gradient Phase']
@@ -150,7 +164,20 @@ class CaractDefect:
         return mins
 
     def get_tau_indices(self, interval=15):
+        """
+        Calculate the tau indices for the given interval.
 
+        Parameters:
+        -----------
+        interval (int):
+          The interval used for calculating the tau indices. Default is 15.
+
+        Returns:
+        -----------
+        output (pandas.DataFrame):
+          A DataFrame containing the peak indices, start and end values of each defect, and the tau indices.
+
+        """
         # variables para usar la función get_indices_tau
         defectos, _ = self.get_defectos() #lista con indices de los defectos
         hilbert, _ = self.get_hilbert() #dataframe con hilbert transform, amplitude, instantaneous phase, gradient phase
@@ -164,6 +191,22 @@ class CaractDefect:
     
 
     def get_tau(self, interval=15):
+        """
+        Calculate the duration, tau, and apparent time for each interval.
+
+        Parameters:
+        -----------
+        interval (int):
+            The interval size in seconds. Default is 15.
+
+        Returns:
+        -----------
+        tuple:
+          A tuple containing two pandas DataFrames. The first DataFrame contains the calculated
+          duration, tau, and apparent time for each interval, while the second DataFrame contains the
+          corresponding sample values.
+
+        """
         df = self.get_tau_indices(interval=interval)
 
         duration_samples = df['end'] - df['start']
@@ -182,14 +225,27 @@ class CaractDefect:
     
 
     def get_no_defectos(self, interval=15):
+        """
+        Returns a copy of the DataFrame with the defects removed.
+
+        Parameters:
+        -----------
+        interval (int):
+          The interval used to calculate tau.
+
+        Returns:
+        -----------
+        tuple:
+          A tuple containing the modified DataFrame and the Hilbert array.
+        """
         df = self.df.copy()
         hilbert, _ = self.get_hilbert()
         defects, _ = self.get_defectos()
         tau = self.get_tau(interval=interval)[1]
-        duration = int(tau['duration'].mean())*2
+        duration = int(tau['duration'].mean()) * 2
 
         for index in defects:
-            df[index-duration:index+duration] = np.nan
-            hilbert[index-duration:index+duration] = np.nan
+            df[index - duration:index + duration] = np.nan
+            hilbert[index - duration:index + duration] = np.nan
 
         return df, hilbert
