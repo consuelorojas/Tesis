@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import scipy.io
-from scipy.signal import butter, filtfilt, hilbert
+from scipy.signal import butter, filtfilt
 
 import sys
 sys.path.append('../data')
