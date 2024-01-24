@@ -1,6 +1,5 @@
 #funciones auxiliares para el programa principal
 import numpy as np
-import scipy.io
 import pandas as pd
 
 def find_nearest(array, value):
