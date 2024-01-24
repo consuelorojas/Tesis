@@ -160,3 +160,33 @@ def find_windows(start_end_defectos, windows):
         result.append(i)
         break
   return result
+
+
+def create_sequences(data, window, horizon):
+  """
+  Create sequences of input and output data for time series forecasting.
+
+  Parameters:
+  -----------
+  data (numpy.ndarray):
+    The input time series data.
+  window (int):
+    The length of the input sequence.
+  horizon (int):
+    The length of the output sequence.
+
+  Returns:
+  -----------
+  numpy.ndarray:
+    The input sequences.
+  numpy.ndarray:
+    The output sequences.
+  """
+  xs, ys = [], []
+  for i in range(len(data) - window - horizon + 1):
+    x = data[i:i+window]
+    y = data[i+window: i+window+horizon]
+    xs.append(x)
+    ys.append(y)
+
+  return np.array(xs), np.array(ys)
