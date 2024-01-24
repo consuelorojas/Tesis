@@ -182,11 +182,11 @@ def create_sequences(data, window, horizon, drop_index):
   numpy.ndarray:
     The output sequences.
   """
-  data =  np.delete(data, [drop_index], axis=1)
+  data2 =  np.delete(data, [drop_index], axis=1)
   xs, ys = [], []
   for i in range(len(data) - window - horizon + 1):
     x = data[i:i+window]
-    y = data[i+window: i+window+horizon]
+    y = data2[i+window: i+window+horizon]
     xs.append(x)
     ys.append(y)
 
