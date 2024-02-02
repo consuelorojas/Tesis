@@ -36,23 +36,24 @@ class StackLSTM(nn.Module):
         self.linear = nn.Linear(self.output_size*self.seq_len, self.output_size)
 
     def forward(self, x):
-        batch_size, seq_len, _ = x.size()
+        batch_size, _, _ = x.size()
 
+        #first layer
         hidden_state =  torch.zeros(self.num_layers, batch_size, self.hidden_size)
         cell_state = torch.zeros(self.num_layers, batch_size, self.hidden_size)
         h1 = (hidden_state, cell_state)
 
-        lstm_out, self.hidden1 = self.lstm1(x, h1) #first layer
+        lstm_out, self.hidden1 = self.lstm1(x, h1)
 
+        #second layer
         hidden_state =  torch.zeros(self.num_layers, batch_size, self.output_size)
         cell_state = torch.zeros(self.num_layers, batch_size, self.output_size)
         h2 = (hidden_state, cell_state)
 
-        lstm_out, self.hidden2 = self.lstm2(lstm_out, h2) #second layer
+        lstm_out, _ = self.lstm2(lstm_out, h2)
 
+        #output layer
         x = lstm_out.contiguous().view(batch_size, -1) #flatten the output
-
-        #x, _ = self.lstm(x) # x are the hidden states, _ is the lstm memory cell
         x = self.linear(x)
         return x
     
