@@ -13,9 +13,9 @@ class AirModel(nn.Module):
         return x
     
 
-class MultiLSTM(nn.Module):
+class StackLSTM(nn.Module):
     def __init__(self, n_features, seq_len, output_size):
-        super(MultiLSTM, self).__init__()
+        super(StackLSTM, self).__init__()
         self.n_features = n_features
         self.seq_len = seq_len
         self.output_size = output_size
