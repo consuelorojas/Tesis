@@ -1,0 +1,3 @@
+load('mid2_080124.mat');
+mid = data[1];
+
