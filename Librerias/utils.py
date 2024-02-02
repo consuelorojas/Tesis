@@ -5,6 +5,7 @@ import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from earlystop import EarlyStopper
+import torch.utils.data as data_utils
 
 def find_nearest(array, value):
     '''
@@ -217,11 +218,6 @@ def split_data(dataset, split=0.8):
   train_size = int(len(dataset) * split)
   train, test = dataset[:train_size], dataset[train_size:]
   return train, test
-def split_data(dataset, split = 0.8):
-
-  train_size =  int(len(dataset)*split)
-  train, test = dataset[:train_size], dataset[train_size:]
-  return train, test
 
 
 def create_dataset(dataset, lookback):
@@ -255,6 +251,9 @@ def create_dataset(dataset, lookback):
   else:
     return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
+def create_loader(X, y, batch_size=32, shuffle=True):
+  loader = data_utils.DataLoader(data_utils.TensorDataset(X, y), shuffle = shuffle, batch_size = batch_size)
+  return loader
 # creck points
 
 def checkpoint(model, optimizer, filename):
@@ -263,12 +262,14 @@ def checkpoint(model, optimizer, filename):
     'model': model.state_dict(),
     }, filename)
     
-def resume(model, filename):
-    model.load_state_dict(torch.load(filename))
+def resume(model, optimizer, filename):
+  check_point  = torch.load(filename)
+  model.load_state_dict(check_point['model'])
+  optimizer.load_state_dict(check_point['optimizer'])
 
 
 def checkpoint_plot(epoch, avg_train_losses, avg_val_losses, train_loss, y_pred, y_val):
-  print(f'Epoch: {epoch}, Train Loss: {avg_train_losses.item()}, Test Loss: {avg_val_losses.item()}')
+  print(f'Epoch: {epoch}, Train Loss: {avg_train_losses[-1]}, Test Loss: {avg_val_losses[-1]}')
   print(f'Epoch: {epoch}, Loss: {train_loss[-1]}')
   plt.plot(y_pred[-1].numpy(), label = 'Prediction')
   plt.plot(y_val[-1].numpy(), label = 'Real')
@@ -289,18 +290,16 @@ def checkpoint_plot(epoch, avg_train_losses, avg_val_losses, train_loss, y_pred,
 
 # training and testing functions
 
-def train_model(model, optimizer, criterion, loader, n_epochs, ncheckpoint =10):
+def train_model(model, optimizer, criterion, train_loader, val_loader, n_epochs, ncheckpoint =10):
   avg_train_losses, avg_val_losses = [], []
   early_stopper = EarlyStopper(patience=ncheckpoint, min_delta=1**-10)
 
   for epoch in tqdm(range(n_epochs)):
-    train_loss, val_loss = []
+    train_loss, val_loss = [], []
     
     try: 
-    #train
       model.train()
-      for x_batch, y_batch in loader:
-        
+      for x_batch, y_batch in train_loader:
         y_pred = model(x_batch.float())
         loss = criterion(y_pred, y_batch.float())
         optimizer.zero_grad()
@@ -311,7 +310,7 @@ def train_model(model, optimizer, criterion, loader, n_epochs, ncheckpoint =10):
       #validation
       model.eval()
       with torch.no_grad():
-        for x_val, y_val in loader:
+        for x_val, y_val in val_loader:
           y_pred = model(x_val.float())
           loss = criterion(y_pred, y_val.float())
           val_loss.append(loss.item())
@@ -342,6 +341,7 @@ def predictions(model, loader):
   with torch.no_grad():
     for x_val, y_val in loader:
       y_pred = model(x_val.float())
+
   return y_pred
 
 
