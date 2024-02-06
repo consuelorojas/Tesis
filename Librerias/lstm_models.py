@@ -13,6 +13,20 @@ class AirModel(nn.Module):
         return x
     
 
+class AirModel_DropOut(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size = 1,hidden_size =  100, num_layers = 1, batch_first = True)
+        self.linear = nn.Linear(100,1)
+        self.dropout = nn.Dropout(0.2)
+
+    def forward(self, x):
+        x, _ = self.lstm(x) # x are the hidden states, _ is the lstm memory cell
+        x = self.dropout(x)
+        x = self.linear(x)
+        return x
+    
+
 class StackLSTM(nn.Module):
     def __init__(self, n_features, seq_len, output_size):
         super(StackLSTM, self).__init__()
