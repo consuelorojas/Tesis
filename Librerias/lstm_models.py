@@ -2,9 +2,10 @@ import torch
 import torch.nn as nn
 
 class AirModel(nn.Module):
-    def __init__(self):
+    def __init__(self, dropout = None):
         super().__init__()
-        self.lstm = nn.LSTM(input_size = 1,hidden_size =  100, num_layers = 1, batch_first = True)
+        self.dropout = dropout
+        self.lstm = nn.LSTM(input_size = 1,hidden_size =  100, num_layers = 3, batch_first = True, dropout = self.dropout)
         self.linear = nn.Linear(100,1)
 
     def forward(self, x):
