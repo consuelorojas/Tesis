@@ -2,10 +2,22 @@ import torch
 import torch.nn as nn
 
 class AirModel(nn.Module):
-    def __init__(self, dropout = None):
+    def __init__(self,):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size = 1,hidden_size =  100, batch_first = True)
+        self.linear = nn.Linear(100,1)
+
+    def forward(self, x):
+        x, _ = self.lstm(x) # x are the hidden states, _ is the lstm memory cell
+        x = self.linear(x)
+        return x
+    
+class AirModelLayers(nn.Module):
+    def __init__(self, n_layers, dropout = None):
         super().__init__()
         self.dropout = dropout
-        self.lstm = nn.LSTM(input_size = 1,hidden_size =  100, num_layers = 3, batch_first = True, dropout = self.dropout)
+        self.num_layers = n_layers
+        self.lstm = nn.LSTM(input_size = 1,hidden_size =  100, num_layers = self.num_layers, batch_first = True, dropout = self.dropout)
         self.linear = nn.Linear(100,1)
 
     def forward(self, x):
