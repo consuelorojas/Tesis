@@ -43,10 +43,10 @@ class EarlyStopper:
               True if early stopping criteria is met, False otherwise.
 
         """
-        if validation_loss[-1] < self.min_validation_loss:
+        if validation_loss < self.min_validation_loss:
             self.min_validation_loss = validation_loss
             self.counter = 0
-        elif validation_loss[-1] > (self.min_validation_loss + self.min_delta) or min(validation_loss[:-1]) < validation_loss[-1] :
+        elif validation_loss > (self.min_validation_loss + self.min_delta):
             self.counter += 1
             if self.counter >= self.patience:
                 return True
