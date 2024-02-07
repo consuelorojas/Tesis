@@ -343,6 +343,10 @@ def checkpoint_plot(epoch, avg_train_losses, avg_val_losses, train_loss, y_pred,
   plt.show()
   plt.close()
 
+def earlystop(avg_loss, patience, epoch):
+  if epoch > patience:
+    return  np.min(avg_loss) < avg_loss[-1]
+  else: return False
 
 # training and testing functions
 
@@ -380,7 +384,8 @@ def train_model(model, optimizer, criterion, train_loader, val_loader, n_epochs,
         checkpoint(model, optimizer, f'checkpoint_{epoch}.pth')
         checkpoint_plot(epoch, avg_train_losses, avg_val_losses, train_loss, y_pred, y_val)
 
-      if early_stopper.early_stop(avg_val_losses[-1]):
+      #if early_stopper.early_stop(avg_val_losses[-1]):
+      if earlystop(avg_val_losses, ncheckpoint, epoch):
         checkpoint(model, optimizer, f'earlystop_{epoch}.pth')
         print(f'Early stopping, saving checkpoint of {epoch}')
   
