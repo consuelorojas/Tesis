@@ -61,7 +61,7 @@ class MatFileToDataFrame:
         mat_data = scipy.io.loadmat(self.file_path+self.file_name)
         signal = pd.DataFrame(mat_data['data'])[0]
         signal_mean = signal.mean(axis=0)
-        signal_filtered = self.butter_bandpass_filter(signal, cutoff)
+        signal_filtered = self.butter_bandpass_filter(signal-signal_mean, cutoff)
         signal_hilbert = self.hilbert_transform(signal_filtered)
         df = pd.concat([signal, signal-signal_mean, signal_filtered, signal_hilbert], axis=1)
         df.columns = ['Original Signal', 'Signal - Mean', 'Filtered Signal', 'Hilbert Transform']
