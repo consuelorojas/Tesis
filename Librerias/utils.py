@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from earlystop import EarlyStopper
 import torch.utils.data as data_utils
+from scipy.signal import butter, filtfilt
 
 def find_nearest(array, value):
     '''
@@ -197,7 +198,60 @@ def create_sequences(data, window, horizon, drop_index):
 
   return np.array(xs), np.array(ys)
 
+def subsample(data, n):
+  """
+  Subsamples the given data by a factor of n.
+
+  Parameters:
+  -----------
+  data (numpy.ndarray):
+    The input data.
+  n (int):
+    The subsampling factor.
+
+  Returns:
+  -----------
+  numpy.ndarray:
+    The subsampled data.
+
+  Examples:
+  -----------
+  >>> data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  >>> subsample(data, 2)
+  array([1, 3, 5, 7, 9])
+  >>> subsample(data, 3)
+  array([1, 4, 7, 10])
+  """
+  
+  subset = data[::n]
+
+  #filtro para eliminar frecuencias parasitarias
+  order = 4
+  cutoff = 100
+
+  b,a = butter(order, cutoff, fs = 1000, btype = 'low', analog = False, output='ba')
+  df = filtfilt(b,a, subset) 
+  return df
+
 # nn functions for dataset creation
+
+def standarize_data(data):
+  """
+  Standarizes the given data.
+
+  Parameters:
+  -----------
+  data (numpy.ndarray):
+    The input data.
+
+  Returns:
+  -----------
+  numpy.ndarray:
+    The standarized data.
+  """
+  mean = np.mean(data)
+  std = np.std(data)
+  return (data - mean) / std
 
 def split_data(dataset, split=0.8):
   """
@@ -220,7 +274,8 @@ def split_data(dataset, split=0.8):
   return train, test
 
 
-def create_dataset(dataset, lookback):
+
+def create_dataset(data, lookback):
   """
   Create a dataset for time series forecasting.
 
@@ -239,6 +294,7 @@ def create_dataset(dataset, lookback):
       The target data tensor.
   """
   X, y = [], []
+  dataset = standarize_data(data)
   for i in range(len(dataset) - lookback):
     X.append(dataset[i:(i + lookback)])
     y.append(dataset[i + 1:i + lookback + 1])
@@ -287,6 +343,10 @@ def checkpoint_plot(epoch, avg_train_losses, avg_val_losses, train_loss, y_pred,
   plt.show()
   plt.close()
 
+def earlystop(avg_loss, patience, epoch):
+  if epoch > patience:
+    return  np.min(avg_loss) < avg_loss[-1]
+  else: return False
 
 # training and testing functions
 
@@ -324,7 +384,8 @@ def train_model(model, optimizer, criterion, train_loader, val_loader, n_epochs,
         checkpoint(model, optimizer, f'checkpoint_{epoch}.pth')
         checkpoint_plot(epoch, avg_train_losses, avg_val_losses, train_loss, y_pred, y_val)
 
-      if early_stopper.early_stop(avg_val_losses[-1]):
+      #if early_stopper.early_stop(avg_val_losses[-1]):
+      if earlystop(avg_val_losses, ncheckpoint, epoch):
         checkpoint(model, optimizer, f'earlystop_{epoch}.pth')
         print(f'Early stopping, saving checkpoint of {epoch}')
   
