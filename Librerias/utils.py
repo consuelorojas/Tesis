@@ -275,16 +275,18 @@ def split_data(dataset, split=0.8):
 
 
 
-def create_dataset(data, lookback):
+def create_dataset(data, window, horizon):
   """
   Create a dataset for time series forecasting.
 
   Parameters:
   -----------
-    dataset (numpy.ndarray):
-      The input dataset.
-    lookback (int):
-      The number of previous time steps to use as input for each sample.
+    data (numpy.ndarray):
+      The input data.
+    window (int):
+      The size of the training window.
+    horizon (int):
+      The size of the prediction horizon.
 
   Returns:
   -----------
@@ -295,9 +297,9 @@ def create_dataset(data, lookback):
   """
   X, y = [], []
   dataset = standarize_data(data)
-  for i in range(len(dataset) - lookback):
-    X.append(dataset[i:(i + lookback)])
-    y.append(dataset[i + 1:i + lookback + 1])
+  for i in range(len(dataset) - window - horizon + 1):
+    X.append(dataset[i:(i + window)])
+    y.append(dataset[(i + window):(i + window + horizon)])
   X = np.array(X)
   y = np.array(y)
   if dataset.ndim == 1:
