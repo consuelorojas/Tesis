@@ -9,12 +9,12 @@ def create_data(data, seq_len):
         Y.append(data[i+seq_len])
     return np.array(X), np.array(Y)
 
-def split_data(x,y, ratio):
+def split_data(x,y,ratio):
+    assert len(x) == len(y)
     N = len(x)
-    Ntrain = int(N * ratio)
-
-    # x_train, y_train, x_test, y_test
-    return x[:Ntrain], y[:Ntrain], x[Ntrain:], y[Ntrain:]
+    x_train, x_test = x[:int(N*ratio)], x[int(N*ratio):]
+    y_train, y_test = y[:int(N*ratio)], y[int(N*ratio):]
+    return x_train, y_train, x_test, y_test
 
 def create_batches(x,y, batch_size):
     N = len(x)
