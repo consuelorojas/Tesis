@@ -7,7 +7,7 @@ class Simple_RNN(nn.Module):
         
         # define the dimensions
         self.in_dim = in_dim
-        self.hid_dim = in_dim
+        self.hid_dim = hid_dim
         self.out_dim = out_dim
         self.layer = num_layers
         

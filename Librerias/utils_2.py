@@ -49,6 +49,7 @@ def train_model(model,
         
         # predict the output
         pred = model(x_train)
+        print(pred.size())
         
         # calculate the loss 
         error = criterion(pred,y_train)
@@ -75,7 +76,7 @@ def train_model(model,
 
 def rollingWindowPrediction(model, x_test, steps = 50):
     output = []
-    N = x_test.shape()[1]
+    N = x_test.size()[1]
 
     with torch.no_grad():
         model.eval()
