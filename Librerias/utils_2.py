@@ -1,12 +1,16 @@
 import numpy as np
+import torch
 from tqdm import tqdm
 
-def create_data(data, seq_len):
+def create_data(data, seq_len, output_dim=1):
     N = len(data)
     X, Y = [], []
     for i in range(N-seq_len):
         X.append(data[i:i+seq_len])
-        Y.append(data[i+seq_len])
+        if output_dim > 1:
+            Y.append(data[i+seq_len:i+seq_len+output_dim])
+        else:
+            Y.append(data[i+seq_len])
     return np.array(X), np.array(Y)
 
 def split_data(x,y,ratio):
@@ -67,3 +71,25 @@ def train_model(model,
             print('Epoch :{}    Train Loss :{}    Test Loss :{}'.format((epoch+1)/epochs, error.item(), test_error.item()))
             
     return train_loss, test_loss
+
+
+def rollingWindowPrediction(model, x_test, steps = 50):
+    output = []
+    N = x_test.shape()[1]
+
+    with torch.no_grad():
+        model.eval()
+        for elem in tqdm(x_test):
+            elem = elem.view(N)
+            test_aux = []
+            count = 0
+            while count < steps:
+                    pred = model(elem.view(1,N,1))
+                    test_aux.append(pred[0,0].item())
+                    elem = torch.cat((elem[1:], pred[0]))
+                    count += 1
+
+            output.append(test_aux)
+    return output
+
+all_test_pred = []
