@@ -91,7 +91,7 @@ def simpleTrain_model(model,
             plot_loss(train_loss[:epoch], test_loss[:epoch], 'Train and Test Loss')
             print('Epoch :{}    Train Loss :{}    Test Loss :{}'.format((epoch+1)/epochs, error.item(), test_error.item()))
             
-        if utils.earlystop(test_loss[:epoch], 2, epoch):
+        if utils.earlystop(test_loss[:epoch], 10, epoch):
             utils.checkpoint(best_model, optimizer, f'earlystop_{best_epoch}.pth')
             print('Early stopping at epoch: ', epoch)
     
