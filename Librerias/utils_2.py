@@ -51,57 +51,60 @@ def simpleTrain_model(model,
     test_loss = np.zeros(epochs)
     best_model = copy.deepcopy(model)
     best_epoch = 0
-
-    
     for epoch in tqdm(range(epochs)):
-        model.train()
-        # put default model grads to zero
-        optimizer.zero_grad()
-        
-        # predict the output
-        pred = model(x_train)
-        #print(pred.size())
-        
-        # calculate the loss 
-        error = criterion(pred.squeeze() ,y_train)
-        
-        # backpropagate the error
-        error.backward()
-        
-        # update the model parameters
-        optimizer.step()
-        
-        # save the losses 
-        train_loss[epoch] = error.item()
-        
-        model.eval()
-        # test loss
-
-        test_pred = model(x_test)
-        test_error = criterion(test_pred.squeeze(), y_test)
-        test_loss[epoch] = test_error.item()
-
-        if test_loss[epoch] < test_loss[epoch-1]:
-            best_epoch = epoch
-            best_model = copy.deepcopy(model)
-
-
-        if (epoch+1) % 5 ==0:
-            utils.checkpoint(model, optimizer, f'checkpoint_{epoch}.pth')
-            plot_loss(train_loss[:epoch], test_loss[:epoch], 'Train and Test Loss')
-            print('Epoch :{}    Train Loss :{}    Test Loss :{}'.format((epoch+1)/epochs, error.item(), test_error.item()))
+        try:
+            model.train()
+            # put default model grads to zero
+            optimizer.zero_grad()
             
-        if utils.earlystop(test_loss[:epoch], 10, epoch):
-            utils.checkpoint(best_model, optimizer, f'earlystop_{best_epoch}.pth')
-            print('Early stopping at epoch: ', epoch)
-    
+            # predict the output
+            pred = model(x_train)
+            #print(pred.size())
+            
+            # calculate the loss 
+            error = criterion(pred.squeeze() ,y_train)
+            
+            # backpropagate the error
+            error.backward()
+            
+            # update the model parameters
+            optimizer.step()
+            
+            # save the losses 
+            train_loss[epoch] = error.item()
+            
+            model.eval()
+            # test loss
+
+            test_pred = model(x_test)
+            test_error = criterion(test_pred.squeeze(), y_test)
+            test_loss[epoch] = test_error.item()
+
+            if test_loss[epoch] < test_loss[epoch-1]:
+                best_epoch = epoch
+                best_model = copy.deepcopy(model)
+
+
+            if (epoch+1) % 5 ==0:
+                utils.checkpoint(model, optimizer, f'checkpoint_{epoch}.pth')
+                plot_loss(train_loss[:epoch], test_loss[:epoch], 'Train and Test Loss')
+                print('Epoch :{}    Train Loss :{}    Test Loss :{}'.format((epoch+1)/epochs, error.item(), test_error.item()))
+                
+            if utils.earlystop(test_loss[:epoch], 10, epoch):
+                utils.checkpoint(best_model, optimizer, f'earlystop_{best_epoch}.pth')
+                print('Early stopping at epoch: ', epoch)
+
+        except KeyboardInterrupt:
+            print('\nTraining Interrupted by user')
+            break
+        
     return train_loss, test_loss
 
 
 #predicción tipo rolling window
 def rollingWindowPrediction(model, x_test, steps = 50):
     output = []
-    N = x_test.size()[1]
+    N = x_test.size()[-1]
     #print(N)
 
     with torch.no_grad():

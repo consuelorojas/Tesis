@@ -84,3 +84,30 @@ class StackLSTM(nn.Module):
         x = self.linear(x)
         return x
     
+
+class LSTM(nn.Module):
+
+    def __init__(self, in_dim, hid_dim, out_dim, num_layers):
+        super(LSTM, self).__init__()
+        self.in_dim = in_dim
+        self.hid_dim = hid_dim
+        self.out_dim = out_dim
+        self.layers = num_layers
+
+        self.lstm = nn.LSTM(in_dim, hid_dim, num_layers, batch_first=True)
+
+        self.fc = nn.Linear(hid_dim, out_dim)
+    
+    def forward(self, x):
+
+        #hidden state
+        h0 = torch.zeros(self.layers, self.hid_dim)
+        c0 = torch.zeros(self.layers, self.hid_dim)
+
+        #forward prop
+        out, (h, c) = self.lstm(x, (h0, c0))
+
+        out = self.fc(out)
+
+        return out
+    
