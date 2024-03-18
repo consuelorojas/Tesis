@@ -80,7 +80,7 @@ def simpleTrain_model(model,
             test_error = criterion(test_pred.squeeze(), y_test)
             test_loss[epoch] = test_error.item()
 
-            if test_loss[epoch] < test_loss[epoch-1]:
+            if test_loss[epoch] <= test_loss[best_epoch]:
                 best_epoch = epoch
                 best_model = copy.deepcopy(model)
 

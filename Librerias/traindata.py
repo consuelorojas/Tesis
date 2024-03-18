@@ -29,14 +29,13 @@ class trainData():
 
         x = ds.MatFileToDataFrame(self.fpath, self.fname)
         y = x.get_dataframe(cutoff)
-
         x = dc.CaractDefect(y)
         t = x.get_tau()[1]
 
         h, _ = x.get_hilbert()
 
         data = pd.merge(y, h, on = 'Hilbert Transform', how = 'outer')
-        
+
         return data
     
 
