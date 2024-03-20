@@ -6,6 +6,7 @@ import utils
 import caract as dc
 import dataset as ds
 import pandas as pd
+import numpy as np
 
 
 '''
@@ -30,18 +31,26 @@ class trainData():
         x = ds.MatFileToDataFrame(self.fpath, self.fname)
         y = x.get_dataframe(cutoff)
         x = dc.CaractDefect(y)
-        t = x.get_tau()[1]
+        t = int(x.get_tau()[1]['duration'].mean())
+        
 
         h, _ = x.get_hilbert()
 
         data = pd.merge(y, h, on = 'Hilbert Transform', how = 'outer')
+
+        defectos = x.get_defectos()[0]
+
+        for index in defectos:
+            data[index-t: index+t] = np.nan
 
         return data
     
 
     def split_data(self, column, ratio = 0.7):
         
-        x = self.data[column].values
+        x = self.data[column]
+        x.interpolate(method='values', inplace=True, limit_direction='both')
+        x = np.asanyarray(x)
         train, val = utils.split_data(x, ratio)
         val, test = utils.split_data(val, 0.5)
 
