@@ -40,6 +40,7 @@ class SimpleRNN(nn.Module):
 
 # Multi-layer perceptron
     
+    
 class MLP(nn.Module):
     '''
     Multi-layer perceptron for non-linear regression.
