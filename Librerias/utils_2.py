@@ -1,9 +1,15 @@
+import sys
+sys.path.append('./data')
+sys.path.append('./Librerias')
+
+
 import numpy as np
 import torch
 from tqdm import tqdm
 import utils
 import matplotlib.pyplot as plt
 import copy
+import errores as er
 
 def create_sequences(data, seq_len, output_dim=1):
     N = len(data)
@@ -144,20 +150,23 @@ def rollingWindowPrediction_SVR(model, x_test, steps=50):
         output.append(test_aux)
     return output
 
-def defectos_test(data, indices, steps , horizonte = 1000, at_defecto = False):
-    defectos_X = []
-    defectos_y = []
-    
+def defectos_set(indices, valores, steps, horizon = 1000):
+    x, y = [], []
     for index in indices:
-        try:
-            if at_defecto:
-                defectos_X.append(data[index:index+horizonte+steps])
-                defectos_y.append(data[index+horizonte+1:data+horizonte+1+steps])
-            else:
-                defectos_X.append(data[index-horizonte//2:index+horizonte//2+steps])
-                defectos_y.append(data[index+horizonte//2+1+steps])
-        except:
-            continue
+        x.append(valores[index-horizon:index].values)
+        y.append(valores[index:index+steps].values)
+    return np.array(x),np.array(y)
 
-         
-    return np.array(defectos_X), np.array(defectos_y)
+def errores_defectosSVR(modelo, indices, valores, steps):
+
+    #prediciones
+    x, y = defectos_set(indices, valores, steps)
+    pred = rollingWindowPrediction_SVR(modelo, x, steps)
+    
+    #errores
+    mse, mape, r2, rmse = er.calculate_errors(pred, y)
+    print(f'Mean Squared Error: {mse}')
+    print(f'Mean Absolute Percentage Error: {mape}')
+    print(f'R2 Score: {r2}')
+    print(f'Root Mean Squared Error: {rmse}')
+    return (pred, y), (mse, mape, r2, rmse)
