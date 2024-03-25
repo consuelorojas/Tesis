@@ -24,3 +24,4 @@ def error_metrics(rolling_window_prediction, test_set, horizon):
     print(f'Root Mean Squared Error: {rmse}')
 
     return mse, mape, r2, rmse
+

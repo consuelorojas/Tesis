@@ -123,3 +123,41 @@ def rollingWindowPrediction(model, x_test, steps = 50):
 
             output.append(test_aux)
     return output
+
+def rollingWindowPrediction_SVR(model, x_test, steps=50):
+    output = []
+    N = x_test.shape[-1]
+
+    for elem in tqdm(x_test):
+        elem = elem.reshape(1, -1)
+        #print(elem)
+        test_aux = []
+        count = 0
+        while count < steps:
+            #print(count)
+            pred = model.predict(elem)
+            test_aux.append(pred[0])
+            elem = np.append(elem, pred)[1:].reshape(1,-1)
+            #print(elem.shape)
+            count += 1
+
+        output.append(test_aux)
+    return output
+
+def defectos_test(data, indices, steps , horizonte = 1000, at_defecto = False):
+    defectos_X = []
+    defectos_y = []
+    
+    for index in indices:
+        try:
+            if at_defecto:
+                defectos_X.append(data[index:index+horizonte+steps])
+                defectos_y.append(data[index+horizonte+1:data+horizonte+1+steps])
+            else:
+                defectos_X.append(data[index-horizonte//2:index+horizonte//2+steps])
+                defectos_y.append(data[index+horizonte//2+1+steps])
+        except:
+            continue
+
+         
+    return np.array(defectos_X), np.array(defectos_y)

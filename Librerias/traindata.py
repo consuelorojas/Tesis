@@ -55,7 +55,17 @@ class trainData():
         val, test = utils.split_data(val, 0.5)
 
         return train, val, test
-    
+
+    def defectos_set(self, cutoff = [8/1000, 11/1000]):
+
+        x = ds.MatFileToDataFrame(self.fpath, self.fname)
+        y = x.get_dataframe(cutoff)
+        x = dc.CaractDefect(y)
+        ind_defectos = x.get_defectos()[0]
+
+        return ind_defectos
+
+
     def get_train(self):
         return self.train
     
@@ -64,4 +74,4 @@ class trainData():
     
     def get_val(self):
         return self.val
-    
+
