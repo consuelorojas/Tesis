@@ -4,3 +4,7 @@ Notebooks/html/eda_ventanas.html
 Librerias/similarity_measures
 Librerias/similarity_measures
 data/.DS_Store
+MultiLayerPerceptron/test100_MLP.csv
+MultiLayerPerceptron/test1000_MLP.csv
+MultiLayerPerceptron/test500_MLP.csv
+MultiLayerPerceptron/test50_MLP.csv
