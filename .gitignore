@@ -12,3 +12,6 @@ SVR/test1000_SVR.csv
 SVR/test100_SVR.csv
 SVR/test500_SVR.csv
 SVR/test50_SVR.csv
+RNN/test500_RNN.csv
+RNN/test1000_RNN.csv
+RNN/test100_RNN.csv
