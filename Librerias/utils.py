@@ -232,8 +232,12 @@ def subsample(data, n):
   order = 4
   cutoff = 100
 
-  b,a = butter(order, cutoff, fs = 1000, btype = 'low', analog = False, output='ba')
-  df = filtfilt(b,a, subset) 
+  try:
+    b,a = butter(order, cutoff, fs = 1000, btype = 'low', analog = False, output='ba')
+    df = filtfilt(b,a, subset)
+  except:
+    df = subset
+  
   return df
 
 # nn functions for dataset creation

@@ -152,9 +152,9 @@ def rollingWindowPrediction_SVR(model, x_test, steps=50):
 
 def defectos_set(indices, valores, steps, horizon = 1000):
     x, y = [], []
-    for index in indices:
-        x.append(valores[index-horizon:index].values)
-        y.append(valores[index:index+steps].values)
+    for index in indices[1:]:
+        x.append(valores[index-horizon:index])
+        y.append(valores[index:index+steps])
     return np.array(x),np.array(y)
 
 def errores_defectosSVR(modelo, indices, valores, steps):
