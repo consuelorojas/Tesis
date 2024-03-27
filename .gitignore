@@ -15,3 +15,6 @@ SVR/test50_SVR.csv
 RNN/test500_RNN.csv
 RNN/test1000_RNN.csv
 RNN/test100_RNN.csv
+MLP Amplitud/test1000_MLP.csv
+MLP Amplitud/test100_MLP.csv
+MLP Amplitud/test500_MLP.csv
