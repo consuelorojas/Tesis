@@ -18,3 +18,5 @@ RNN/test100_RNN.csv
 MLP Amplitud/test1000_MLP.csv
 MLP Amplitud/test100_MLP.csv
 MLP Amplitud/test500_MLP.csv
+MLP Fase/test100_MLPFase.csv
+SVRFase/test100_SVR.csv
