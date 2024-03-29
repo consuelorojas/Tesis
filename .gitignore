@@ -20,3 +20,12 @@ MLP Amplitud/test100_MLP.csv
 MLP Amplitud/test500_MLP.csv
 MLP Fase/test100_MLPFase.csv
 SVRFase/test100_SVR.csv
+MLP Fase/MLPFase_test.ipynb
+MLP Fase/test1000_MLPFase.csv
+MLP Fase/test500_MLPFase.csv
+SVRFase/test1000_SVR.csv
+SVRFase/test500_SVR.csv
+MLP Fase/MLPFase_test.ipynb
+GBoosting/test100_GBoost.csv
+GB Amplitude/test500_GBoost_defectos.csv
+GBoosting/test500_GBoost.csv
